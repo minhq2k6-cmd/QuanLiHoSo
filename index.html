@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý Hồ sơ Công chức</title>
+    <style>
+        /* Một chút CSS cho web dễ nhìn hơn */
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        input, select { padding: 8px; width: 200px; }
+        button { padding: 10px 15px; background-color: #007BFF; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+
+    <h2>Thêm mới Hồ sơ Công chức</h2>
+    
+    <div id="form-nhan-vien">
+        <div class="form-group">
+            <label>Mã CCVC:</label><br>
+            <input type="text" id="maNV" placeholder="VD: CC001">
+        </div>
+        <div class="form-group">
+            <label>Họ và Tên:</label><br>
+            <input type="text" id="hoTen" placeholder="Nhập họ tên">
+        </div>
+        <div class="form-group">
+            <label>Phòng ban:</label><br>
+            <select id="phongBan">
+                <option value="Hành chính">Phòng Hành chính</option>
+                <option value="Tài vụ">Phòng Tài vụ</option>
+                <option value="Tổ chức cán bộ">Phòng Tổ chức cán bộ</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Hệ số lương:</label><br>
+            <input type="number" step="0.01" id="bacLuong" placeholder="VD: 2.34">
+        </div>
+        
+        <button onclick="luuHoSo()">Lưu Hồ Sơ</button>
+    </div>
+
+    <hr>
+
+    <h2>Danh sách Công chức</h2>
+    <ul id="danhSachHienThi"></ul>
+
+    <script src="main.js"></script>
+</body>
+</html>
