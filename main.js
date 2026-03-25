@@ -1,49 +1,52 @@
-// Dữ liệu giả lập mô phỏng kết quả từ lệnh: SELECT * FROM Employee FOR JSON AUTO
-const dataTuSQL = [
-    {
-        "MaNV": "NV001",
-        "HoTen": "Nguyễn Văn Hùng",
-        "PhongBan": "Phòng Hành chính",
-        "ChucVu": "Trưởng phòng",
-        "HeSoLuong": 4.4,
-        "TrangThai": "Đang công tác"
-    },
-    {
-        "MaNV": "NV002",
-        "HoTen": "Trần Thị Lan",
-        "PhongBan": "Phòng Kế toán",
-        "ChucVu": "Chuyên viên",
-        "HeSoLuong": 3.2,
-        "TrangThai": "Đang công tác"
-    },
-    {
-        "MaNV": "NV003",
-        "HoTen": "Lê Minh Quân",
-        "PhongBan": "Phòng Tổ chức",
-        "ChucVu": "Phó phòng",
-        "HeSoLuong": 3.8,
-        "TrangThai": "Nghỉ phép"
-    }
-];
+// 1. Khi trang web vừa mở, lấy dữ liệu cũ đã lưu trong trình duyệt ra (nếu có)
+let dsNhanVien = JSON.parse(localStorage.getItem('database_nhansu')) || [];
 
-function hienThiDanhSach() {
-    const listArea = document.getElementById('employee-list');
-    listArea.innerHTML = "";
+const form = document.getElementById('employeeForm');
+const tableBody = document.getElementById('employeeTable');
 
-    dataTuSQL.forEach(item => {
-        let row = `
+// 2. Hàm để hiển thị danh sách ra bảng
+function hienThi() {
+    tableBody.innerHTML = "";
+    dsNhanVien.forEach((nv, index) => {
+        tableBody.innerHTML += `
             <tr>
-                <td><strong>${item.MaNV}</strong></td>
-                <td>${item.HoTen}</td>
-                <td>${item.PhongBan}</td>
-                <td>${item.ChucVu}</td>
-                <td><span class="text-danger fw-bold">${item.HeSoLuong}</span></td>
-                <td><span class="badge bg-success status-badge">${item.TrangThai}</span></td>
+                <td><strong>${nv.maNV}</strong></td>
+                <td>${nv.hoTen}</td>
+                <td>${nv.phongBan}</td>
+                <td class="text-danger fw-bold">${nv.heSo}</td>
+                <td><button class="btn btn-sm btn-outline-danger" onclick="xoaNV(${index})">Xóa</button></td>
             </tr>
         `;
-        listArea.innerHTML += row;
     });
 }
 
-// Gọi hàm chạy khi trang web mở lên
-window.onload = hienThiDanhSach;
+// 3. Xử lý khi bấm nút "Lưu Hồ Sơ"
+form.onsubmit = function(e) {
+    e.preventDefault(); // Chặn trang web bị load lại
+
+    // Lấy giá trị từ các ô nhập
+    const moi = {
+        maNV: document.getElementById('maNV').value,
+        hoTen: document.getElementById('hoTen').value,
+        phongBan: document.getElementById('phongBan').value,
+        heSo: document.getElementById('heSo').value
+    };
+
+    // Thêm vào danh sách và lưu vào bộ nhớ máy tính
+    dsNhanVien.push(moi);
+    localStorage.setItem('database_nhansu', JSON.stringify(dsNhanVien));
+
+    // Làm sạch form và hiện lại bảng
+    form.reset();
+    hienThi();
+};
+
+// 4. Hàm xóa nhân viên
+function xoaNV(index) {
+    dsNhanVien.splice(index, 1);
+    localStorage.setItem('database_nhansu', JSON.stringify(dsNhanVien));
+    hienThi();
+}
+
+// Chạy hiển thị lần đầu khi mở web
+hienThi();
