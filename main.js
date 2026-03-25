@@ -1,52 +1,71 @@
-// 1. Khi trang web vừa mở, lấy dữ liệu cũ đã lưu trong trình duyệt ra (nếu có)
-let dsNhanVien = JSON.parse(localStorage.getItem('database_nhansu')) || [];
+// Đảm bảo mã chạy sau khi trang web đã tải xong toàn bộ HTML
+window.onload = function() {
+    // 1. Khởi tạo dữ liệu (Lấy từ bộ nhớ máy tính hoặc mảng trống)
+    let dsNhanVien = JSON.parse(localStorage.getItem('database_nhansu')) || [];
 
-const form = document.getElementById('employeeForm');
-const tableBody = document.getElementById('employeeTable');
+    // 2. Lấy các "giỏ" dữ liệu từ HTML
+    const form = document.getElementById('employeeForm');
+    const tableBody = document.getElementById('employeeTable');
+    const noDataMessage = document.getElementById('noDataMessage');
 
-// 2. Hàm để hiển thị danh sách ra bảng
-function hienThi() {
-    tableBody.innerHTML = "";
-    dsNhanVien.forEach((nv, index) => {
-        tableBody.innerHTML += `
-            <tr>
-                <td><strong>${nv.maNV}</strong></td>
-                <td>${nv.hoTen}</td>
-                <td>${nv.phongBan}</td>
-                <td class="text-danger fw-bold">${nv.heSo}</td>
-                <td><button class="btn btn-sm btn-outline-danger" onclick="xoaNV(${index})">Xóa</button></td>
-            </tr>
-        `;
-    });
-}
+    // 3. Hàm hiển thị dữ liệu ra bảng
+    function hienThi() {
+        if (!tableBody) return; // Bảo vệ nếu không tìm thấy ID table
+        
+        tableBody.innerHTML = ""; // Xóa bảng cũ
 
-// 3. Xử lý khi bấm nút "Lưu Hồ Sơ"
-form.onsubmit = function(e) {
-    e.preventDefault(); // Chặn trang web bị load lại
+        if (dsNhanVien.length === 0) {
+            noDataMessage.classList.remove('d-none');
+        } else {
+            noDataMessage.classList.add('d-none');
+            dsNhanVien.forEach((nv, index) => {
+                tableBody.innerHTML += `
+                    <tr>
+                        <td><strong>${nv.maNV}</strong></td>
+                        <td>${nv.hoTen}</td>
+                        <td><span class="badge bg-info text-dark">${nv.phongBan}</span></td>
+                        <td class="text-danger fw-bold">${nv.heSo}</td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-danger" onclick="xoaNV(${index})">Xóa</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+    }
 
-    // Lấy giá trị từ các ô nhập
-    const moi = {
-        maNV: document.getElementById('maNV').value,
-        hoTen: document.getElementById('hoTen').value,
-        phongBan: document.getElementById('phongBan').value,
-        heSo: document.getElementById('heSo').value
+    // 4. Xử lý sự kiện khi bấm nút "Lưu"
+    if (form) {
+        form.onsubmit = function(e) {
+            e.preventDefault(); // Không cho trang web tải lại
+
+            // Lấy dữ liệu từ các ô nhập
+            const moi = {
+                maNV: document.getElementById('maNV').value,
+                hoTen: document.getElementById('hoTen').value,
+                phongBan: document.getElementById('phongBan').value,
+                heSo: document.getElementById('heSo').value
+            };
+
+            // Thêm vào mảng và lưu lại vào máy tính (LocalStorage)
+            dsNhanVien.push(moi);
+            localStorage.setItem('database_nhansu', JSON.stringify(dsNhanVien));
+
+            // Xóa sạch ô nhập và cập nhật lại bảng
+            form.reset();
+            hienThi();
+            alert("Đã thêm hồ sơ: " + moi.hoTen);
+        };
+    }
+
+    // 5. Hàm xóa nhân viên (Gắn vào cửa sổ trình duyệt để nút Xóa gọi được)
+    window.xoaNV = function(index) {
+        if(confirm("Bạn có chắc muốn xóa hồ sơ này?")) {
+            dsNhanVien.splice(index, 1);
+            localStorage.setItem('database_nhansu', JSON.stringify(dsNhanVien));
+            hienThi();
+        }
     };
 
-    // Thêm vào danh sách và lưu vào bộ nhớ máy tính
-    dsNhanVien.push(moi);
-    localStorage.setItem('database_nhansu', JSON.stringify(dsNhanVien));
-
-    // Làm sạch form và hiện lại bảng
-    form.reset();
+    // Chạy hiển thị lần đầu
     hienThi();
 };
-
-// 4. Hàm xóa nhân viên
-function xoaNV(index) {
-    dsNhanVien.splice(index, 1);
-    localStorage.setItem('database_nhansu', JSON.stringify(dsNhanVien));
-    hienThi();
-}
-
-// Chạy hiển thị lần đầu khi mở web
-hienThi();
